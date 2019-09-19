@@ -13,11 +13,14 @@ class LRUCache:
     """
 
     def __init__(self, limit=10):
-        self.max_nodes = limit
-        self.count = 0
-        self.current_node = None
-        self.cache = {}
-        self.storage = DoublyLinkedList()
+        # DLL to store the order
+        self.order = DoublyLinkedList()
+        # Dict storekey value pairs
+        self.storage = dict()
+        # current size
+        self.size = 0
+        # limit
+        self.limit = limit
 
     """
   Retrieves the value associated with the given key. Also
@@ -28,13 +31,15 @@ class LRUCache:
   """
 
     def get(self, key):
-        if self.count == 0 or key not in self.cache:
+        # pull the value out of the dictionary using the key
+        if key in self.storage:
+            node = self.storage[key]
+            self.order.move_to_front(node)
+            return node.value[1]
+        # Update the position of the list
+        else:
             return None
-        elif key in self.cache:
-            current_node = self.cache[key]
-            self.storage.delete(current_node)
-            self.storage.add_to_head([key, current_node])
-            return current_node
+        # or return none
 
     """
   Adds the given key-value pair to the cache. The newly-
@@ -48,16 +53,25 @@ class LRUCache:
   """
 
     def set(self, key, value):
-        if key in self.cache:
-            current_node = self.cache[key]
-            self.storage.delete(current_node)
-            self.storage.add_to_head([key, value])
-            self.cache[key] = [value, self.storage.head]
+        # Add pair to the cache - add to the dict and add it nodes/DLL
+        if key in self.storage:  # update dict
+            node = self.storage[key]
+            # makes it easy to grab the key and value
+            node.value = (key, value)
+        # Marks as most recently used - Put in the head of the DLL
+            self.order.move_to_front(node)
             return
 
-            if self.max_nodes is self.count:
-                self.storage.remove_from_tail()
+        # If at max capacity, dump oldest - remove from tail of DLL
+        if self.size == self.limit:
+            # dump the oldest
+            # Remove it from the linked list
+            # remove it from the dictionary
+            del self.storage(self.order.tail.value[0])
+            self.order.remove_from_tail()
+            self.size -= 1
 
-            self.storage.add_to_head([key, value])
-            self.cache[key] = [value, self.storage.head]
-            self.count += 1
+        # Add pair to the cache - add to dict and it node/DLL
+        self.order.add_to_tail((key, value))
+        self.storage[key] = self.order.head
+        self.size += 1
