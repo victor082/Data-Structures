@@ -1,8 +1,8 @@
-# import sys
-
-# from dll_stack import Stack
-# from dll_queue import Queue
-# sys.path.append('..\queue_and_stack')
+from dll_stack import Stack
+from dll_queue import Queue
+import sys
+import io
+sys.path.append('../queue_and_stack')
 
 
 class BinarySearchTree:
@@ -38,20 +38,17 @@ class BinarySearchTree:
         # Check if the current value is the target, if so, we're done
         # Otherwise, left or right based on bigger or smaller, and then call contains again
 
-        if self.value == target:
+        if self.value is target:
             return True
-        if self.target < self.value:
-            # go left
-            if not self.left:
-                return False
-            else:
-                return self.left.contains(target)
+        # edge cases, no kiddos
+        elif not self.right and not self.left:
+            return False
+        # else if target > node, go right, recursively calling contains
+        elif target >= self.value:
+            return self.right.contains(target)
+        # else if target < node, go left, recursively calling contains
         else:
-            # go right
-            if not self.right:
-                return False
-            else:
-                return self.right.contains(target)
+            return self.left.contains(target)
 
     def get_max(self):
         # the max node is farthest to the right
@@ -80,17 +77,44 @@ class BinarySearchTree:
     # Print all the values in order from low to high
     # Hint:  Use a recursive, depth first traversal
     def in_order_print(self, node):
-        pass
+        if node.left:
+            node.in_order_print(node.left)
+        print(node.value)
+        if node.right:
+            node.in_order_print(node.right)
 
-    # Print the value of every node, starting with the given node,
-    # in an iterative breadth first traversal
+        # Start on the top
+        # Go into directions until you can't go
+        # Go back until you find the one you can
+        # go in a different direction
+        # continue until done
+
+        # Print the value of every node, starting with the given node,
+        # in an iterative breadth first traversal
+
     def bft_print(self, node):
-        pass
-
+        queue = Queue()
+        queue.enqueue(node)
+        while queue.size > 0:
+            variable = queue.dequeue()
+            print(variable.value)
+            if variable.left:
+                queue.enqueue(variable.left)
+            if variable.right:
+                queue.enqueue(variable.right)
     # Print the value of every node, starting with the given node,
     # in an iterative depth first traversal
+
     def dft_print(self, node):
-        pass
+        stackAttack = Stack()
+        stackAttack.push(node)
+        while stackAttack.size > 0:
+            variable = stackAttack.pop()
+            print(variable.value)
+            if variable.left:
+                stackAttack.push(variable.left)
+            if variable.right:
+                stackAttack.push(variable.right)
 
     # STRETCH Goals -------------------------
     # Note: Research may be required
